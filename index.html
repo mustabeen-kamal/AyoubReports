@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Travlink Booking</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+
+    <div class="form-section">
+        <h2>Company Data</h2>
+        <label>Company Phone:</label><input type="text" id="companyPhone"><br>
+        <label>Address:</label><input type="text" id="companyAddress"><br>
+        <br>
+        
+        <h2>Booking Details</h2>
+        <label>Voucher Reference:</label><input type="text" id="voucherReference"><br>
+        <label>Booking ID:</label><input type="text" id="bookingId"><br>
+        <label>Supplier:</label><input type="text" id="supplier" value="Tunisiaheds" readonly><br>
+        <label>Booking ID supplier:</label><input type="text" id="bookingIdSupplier"><br>
+        <label>Booking Date:</label><input type="date" id="bookingDate"><br>
+        <label>Time:</label><input type="time" id="bookingTime"><br>
+        <br>
+        
+        <h2>Hotel Information</h2>
+        <label>Hotel Name:</label><input type="text" id="hotelName"><br>
+        <label>Check-in:</label><input type="date" id="checkIn"><br>
+        <label>Check-out:</label><input type="date" id="checkOut"><br>
+        <br>
+        
+        <label>Upload Logo:</label>
+        <input type="file" id="logoUpload" accept="image/*"><br>
+        <img id="logoPreview" src="" alt="Logo" style="max-width:120px;display:none;"><br>
+        <hr>
+    </div>
+
+    <div class="rooms-section">
+        <h2>Number of Rooms:</h2>
+        <input type="number" id="roomCount" min="1" max="10">
+        <button onclick="generateRooms()">Generate Rooms</button>
+        <div id="roomsContainer"></div>
+    </div>
+
+    <hr>
+    <div>
+        <button onclick="addRoomsToTable()">Add to Table</button>
+        <button onclick="resetAll()">Reset All</button>
+        <button onclick="printReport()">Print PDF</button>
+    </div>
+    <hr>
+    
+    <h2>Booked Rooms</h2>
+    <table id="roomsTable">
+        <thead>
+            <tr>
+                <th>Room Number</th>
+                <th>Room Type</th>
+                <th>Meal Plan</th>
+                <th>Guest Count</th>
+                <th>Guest Names</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
