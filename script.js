@@ -115,6 +115,8 @@ function addRoomsToTable(){
 function resetAll(){
     document.getElementById('companyPhone').value='';
     document.getElementById('companyAddress').value='';
+    document.getElementById('mail').value='';
+    document.getElementById('phone').value='';
     document.getElementById('voucherReference').value='';
     document.getElementById('bookingId').value='';
     document.getElementById('bookingIdSupplier').value='';
@@ -156,11 +158,11 @@ function printReport(){
         <hr style="margin: 20px 0;">
         
         <div style="margin-bottom: 20px;">
-            <p><strong>Mail</strong> : info@johbooking.com<br>
-            <strong>Phone</strong> : +21621602121</p>
+            <p><strong>Mail</strong> : ${document.getElementById('mail').value || ''}<br>
+            <strong>Phone</strong> : ${document.getElementById('phone').value || ''}</p>
             
-            <p><strong>Address</strong> : Libya. Tripoli<br>
-            <strong>Phone</strong> : 0980031113</p>
+            <p><strong>Address</strong> : ${document.getElementById('companyAddress').value || 'Libya. Tripoli'}<br>
+            <strong>Phone</strong> : ${document.getElementById('companyPhone').value || '0980031113'}</p>
         </div>
         
         <hr style="margin: 20px 0;">
@@ -221,38 +223,32 @@ function printReport(){
                         <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Room Type</th>
                         <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Meal Plan</th>
                         <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Guest Count</th>
-                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Guest Names</th>
+                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Guests</th>
                     </tr>
                 </thead>
                 <tbody>
-                    ${document.getElementById('roomsTable').getElementsByTagName('tbody')[0].innerHTML}
+                    ${[...document.getElementById('roomsTable').getElementsByTagName('tbody')[0].rows].map(row=>{
+                        return `<tr>
+                            <td style="border:1px solid #ddd;padding:6px;text-align:center;">${row.cells[0].innerText}</td>
+                            <td style="border:1px solid #ddd;padding:6px;text-align:center;">${row.cells[1].innerText}</td>
+                            <td style="border:1px solid #ddd;padding:6px;text-align:center;">${row.cells[2].innerText}</td>
+                            <td style="border:1px solid #ddd;padding:6px;text-align:center;">${row.cells[3].innerText}</td>
+                            <td style="border:1px solid #ddd;padding:6px;text-align:center;">${row.cells[4].innerText}</td>
+                        </tr>`;
+                    }).join('')}
                 </tbody>
             </table>
         </div>
-        
-        <hr style="margin: 20px 0;">
-        
-        <div style="margin-top: 20px; font-size: 12px; color: #555;">
-            <ul style="padding-left: 20px;">
-                <li>Tourism tax in Tunisian hotels is not included and must be paid on-site.</li>
-                <li>Check-in from 2.00 PM | Check-out by 12.00 PM.</li>
-                <li>Most bookings are non-refundable. Please check the cancellation policy before booking.</li>
-            </ul>
-        </div>
     `;
 
-    document.body.appendChild(container);
-
-    html2canvas(container).then(function(canvas){
-        let imgData = canvas.toDataURL('image/png');
-        let pdf = new window.jspdf.jsPDF({orientation:"p",unit:"pt",format:"a4"});
-        let pageWidth = pdf.internal.pageSize.getWidth();
-        let pageHeight = pdf.internal.pageSize.getHeight();
-        let imgProps = pdf.getImageProperties(imgData);
-        let pdfWidth = pageWidth - 40;
-        let pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-        pdf.addImage(imgData, 'PNG', 20, 20, pdfWidth, pdfHeight);
-        pdf.save("BookingReport.pdf");
-        document.body.removeChild(container);
+    html2canvas(container).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgProps= pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save('booking_report.pdf');
     });
 }
