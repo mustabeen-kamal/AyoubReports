@@ -1,73 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Travlink Booking</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="MUSTABEEN_KAMAL">
+<title>Login Page</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: radial-gradient(circle at top left, #1e237b, #6a8af3);
+        overflow: hidden;
+    }
+
+    .login-container {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(15px);
+        padding: 50px 40px;
+        border-radius: 20px;
+        box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+        width: 360px;
+        text-align: center;
+        color: white;
+        transition: transform 0.4s;
+    }
+
+    .login-container:hover {
+        transform: translateY(-5px);
+    }
+
+    .login-container h2 {
+        margin-bottom: 30px;
+        font-weight: 600;
+        font-size: 28px;
+        letter-spacing: 1px;
+        color: #ffffff;
+    }
+
+    .login-container input {
+        width: 100%;
+        padding: 14px;
+        margin: 12px 0;
+        border-radius: 12px;
+        border: none;
+        outline: none;
+        font-size: 16px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        transition: 0.3s;
+    }
+
+    .login-container input::placeholder {
+        color: rgba(255,255,255,0.7);
+    }
+
+    .login-container input:focus {
+        background: rgba(255, 255, 255, 0.3);
+        box-shadow: 0 0 10px rgba(255,255,255,0.5);
+    }
+
+    .login-container button {
+        width: 100%;
+        padding: 14px;
+        margin-top: 20px;
+        border-radius: 12px;
+        border: none;
+        background: #ffffff;
+        color: #1e237b;
+        font-size: 17px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .login-container button:hover {
+        background: #6a8af3;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .error-message {
+        color: #ff4d4d;
+        margin-top: 15px;
+        font-weight: 500;
+        display: none;
+        animation: shake 0.3s;
+    }
+
+    @keyframes shake {
+        0% { transform: translateX(0px); }
+        25% { transform: translateX(-5px); }
+        50% { transform: translateX(5px); }
+        75% { transform: translateX(-5px); }
+        100% { transform: translateX(0px); }
+    }
+</style>
 </head>
 <body>
-<div class="container">
 
-    <div class="form-section">
-        <h2>Company Data</h2>
-        <label>Company Phone:</label><input type="text" id="companyPhone"><br>
-        <label>Address:</label><input type="text" id="companyAddress"><br>
-        <label>Mail:</label><input type="text" id="mail"><br>
-        <label>Phone:</label><input type="text" id="phone"><br>
-        <br>
-        
-        <h2>Booking Details</h2>
-        <label>Voucher Reference:</label><input type="text" id="voucherReference"><br>
-        <label>Booking ID:</label><input type="text" id="bookingId"><br>
-        <label>Supplier:</label><input type="text" id="supplier" value="Tunisiaheds" readonly><br>
-        <label>Booking ID supplier:</label><input type="text" id="bookingIdSupplier"><br>
-        <label>Booking Date:</label><input type="date" id="bookingDate"><br>
-        <label>Time:</label><input type="time" id="bookingTime"><br>
-        <br>
-        
-        <h2>Hotel Information</h2>
-        <label>Hotel Name:</label><input type="text" id="hotelName"><br>
-        <label>Check-in:</label><input type="date" id="checkIn"><br>
-        <label>Check-out:</label><input type="date" id="checkOut"><br>
-        <br>
-        
-        <label>Upload Logo:</label>
-        <input type="file" id="logoUpload" accept="image/*"><br>
-        <img id="logoPreview" src="" alt="Logo" style="max-width:120px;display:none;"><br>
-        <hr>
-    </div>
-
-    <div class="rooms-section">
-        <h2>Number of Rooms:</h2>
-        <input type="number" id="roomCount" min="1" max="10">
-        <button onclick="generateRooms()">Generate Rooms</button>
-        <div id="roomsContainer"></div>
-    </div>
-
-    <hr>
-    <div>
-        <button onclick="addRoomsToTable()">Add to Table</button>
-        <button onclick="resetAll()">Reset All</button>
-        <button onclick="printReport()">Print PDF</button>
-    </div>
-    <hr>
-    
-    <h2>Booked Rooms</h2>
-    <table id="roomsTable">
-        <thead>
-            <tr>
-                <th>Room Number</th>
-                <th>Room Type</th>
-                <th>Meal Plan</th>
-                <th>Guest Count</th>
-                <th>Guest Names</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+<div class="login-container">
+    <h2>Welcome Back</h2>
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <div class="error-message" id="errorMsg">Invalid username or password!</div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="script.js"></script>
+
+<script>
+    const correctUsername = "Sirius Black";
+    const correctPassword = "Harry_Potter";
+
+    function login() {
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+
+        if(username === correctUsername && password === correctPassword) {
+            window.location.href = "main.html";
+        } else {
+            const error = document.getElementById("errorMsg");
+            error.style.display = "block";
+            error.classList.remove('shake');
+            void error.offsetWidth;
+            error.classList.add('shake');
+        }
+    }
+</script>
+
 </body>
 </html>

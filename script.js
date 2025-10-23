@@ -1,16 +1,6 @@
+// script.js (fixed)
 let roomsBackup = {};
-
-document.getElementById('logoUpload').addEventListener('change', function(e){
-    let img = document.getElementById('logoPreview');
-    if (e.target.files && e.target.files[0]){
-        let reader = new FileReader();
-        reader.onload = function(ev){
-            img.src = ev.target.result;
-            img.style.display = 'block';
-        }
-        reader.readAsDataURL(e.target.files[0]);
-    }
-});
+let roomsData = [];
 
 function generateRooms(){
     let count = parseInt(document.getElementById('roomCount').value);
@@ -24,7 +14,7 @@ function generateRooms(){
         panel.id = "roomPanel"+i;
 
         let roomLabel = document.createElement('label');
-        roomLabel.textContent = "Room " + i;
+        roomLabel.textContent = "Room " + i + " ";
         panel.appendChild(roomLabel);
 
         let roomType = document.createElement('select');
@@ -36,50 +26,80 @@ function generateRooms(){
         meal.style.marginLeft = "9px";
         panel.appendChild(meal);
 
+        panel.appendChild(document.createTextNode("  Guests Count: "));
         let guestCount = document.createElement('input');
         guestCount.type = "number";
         guestCount.value = 2;
         guestCount.min = 1;
         guestCount.max = 6;
-        guestCount.style.marginLeft = "11px";
-        panel.appendChild(document.createTextNode("Guests Count:"));
+        guestCount.style.marginLeft = "6px";
         panel.appendChild(guestCount);
 
         let guestsDiv = document.createElement('div');
         guestsDiv.className = "guests-container";
         panel.appendChild(guestsDiv);
 
-        function renderGuests(n){
-            guestsDiv.innerHTML = "";
-            for(let j=1;j<=n;j++){
-                let group = document.createElement('div');
-                group.className = "guest-group";
-                
-                let gtype = document.createElement('select');
-                gtype.innerHTML='<option>Adult</option><option>Child</option>';
-                
-                let gtitle = document.createElement('select');
-                gtitle.innerHTML='<option>Mr</option><option>Mrs</option><option>Ms</option>';
-                
-                let gname = document.createElement('input');
-                gname.type = "text";
-                gname.placeholder = 'Guest ' + j;
-                
-                group.appendChild(gtype);
-                group.appendChild(gtitle);
-                group.appendChild(gname);
-                guestsDiv.appendChild(group);
-            }
+      function renderGuests(n){
+    guestsDiv.innerHTML = "";
+    for(let j=1;j<=n;j++){
+        let group = document.createElement('div');
+        group.className = "guest-group";
+        group.style.marginTop = "6px";
+
+        let gtype = document.createElement('select');
+        gtype.innerHTML='<option>Adult</option><option>Child</option>';
+        gtype.style.marginRight = "6px";
+
+        let gtitle = document.createElement('select');
+        gtitle.innerHTML='<option>Mr</option><option>Mrs</option><option>Ms</option>';
+        gtitle.style.marginRight = "6px";
+
+        let gname = document.createElement('input');
+        gname.type = "text";
+        gname.placeholder = 'Guest ' + j;
+
+        // combo box للأعمار
+        let ageSelect = document.createElement('select');
+        for(let k=1; k<=12; k++){
+            let opt = document.createElement('option');
+            opt.value = k;
+            opt.textContent = k;
+            ageSelect.appendChild(opt);
         }
+        ageSelect.style.marginLeft = "6px";
+        ageSelect.style.display = "none"; // مخفي افتراضيًا
+
+        gtype.addEventListener('change', function(){
+            if(this.value === "Child"){
+                ageSelect.style.display = "inline-block";
+            } else {
+                ageSelect.style.display = "none";
+            }
+        });
+
+        group.appendChild(gtype);
+        group.appendChild(gtitle);
+        group.appendChild(gname);
+        group.appendChild(ageSelect);
+
+        guestsDiv.appendChild(group);
+    }
+}
+
+
         guestCount.addEventListener('input', function(){
-            let val = parseInt(this.value);
-            if(val>0 && val<=6) renderGuests(val);
+            let val = parseInt(this.value) || 0;
+            if(val < 1) val = 1;
+            if(val > 6) val = 6;
+            this.value = val;
+            renderGuests(val);
         });
         renderGuests(guestCount.value);
 
         container.appendChild(panel);
 
         roomsBackup[i] = {
+            number: i,
             RoomType: roomType,
             MealPlan: meal,
             GuestCount: guestCount,
@@ -89,166 +109,278 @@ function generateRooms(){
 }
 
 function addRoomsToTable(){
-    let table = document.getElementById('roomsTable').getElementsByTagName('tbody')[0];
-    table.innerHTML = "";
-    for(let i=1; i<=Object.keys(roomsBackup).length; i++){
-        let row = table.insertRow();
-        row.insertCell(0).innerText = i;
+    // empty previous table
+    let tableBody = document.getElementById('roomsTable').getElementsByTagName('tbody')[0];
+    tableBody.innerHTML = "";
+    roomsData = [];
+
+    const keys = Object.keys(roomsBackup).map(k => parseInt(k)).sort((a,b)=>a-b);
+    for(let idx=0; idx<keys.length; idx++){
+        let i = keys[idx];
         let data = roomsBackup[i];
+        let row = tableBody.insertRow();
+
+        row.insertCell(0).innerText = data.number;
         row.insertCell(1).innerText = data.RoomType.value;
         row.insertCell(2).innerText = data.MealPlan.value;
         row.insertCell(3).innerText = data.GuestCount.value;
 
-        // Guests
+        // Guests with age for children
         let guestsList = [];
         let guestGroups = data.GuestsDiv.getElementsByClassName('guest-group');
-        for(let g=0;g<guestGroups.length;g++){
-            let type = guestGroups[g].getElementsByTagName('select')[0].value;
-            let title = guestGroups[g].getElementsByTagName('select')[1].value;
-            let name = guestGroups[g].getElementsByTagName('input')[0].value;
-            guestsList.push(type + ' · ' + title + ' ' + name);
+        for(let g=0; g<guestGroups.length; g++){
+            let selects = guestGroups[g].getElementsByTagName('select');
+            let inputs = guestGroups[g].getElementsByTagName('input');
+            let type = selects[0] ? selects[0].value : '';
+            let title = selects[1] ? selects[1].value : '';
+            let name = inputs[0] ? inputs[0].value : '';
+            
+            let ageText = '';
+            if(type === 'Child' && selects[2]){
+                ageText = ' (' + selects[2].value + ' yrs)';
+            }
+
+            guestsList.push(type + ' · ' + title + ' ' + name + ageText);
         }
         row.insertCell(4).innerText = guestsList.join(', ');
+
+        // push to roomsData for PDF
+        roomsData.push({
+            number: data.number,
+            type: data.RoomType.value,
+            mealPlan: data.MealPlan.value,
+            guestCount: data.GuestCount.value,
+            guestNames: guestsList.join(', ')
+        });
+    }
+
+    if (roomsData.length === 0) {
+        // if nothing generated, add default room to both table and roomsData
+        let row = tableBody.insertRow();
+        row.insertCell(0).innerText = 1;
+        row.insertCell(1).innerText = 'Standard room';
+        row.insertCell(2).innerText = 'BB';
+        row.insertCell(3).innerText = 2;
+        row.insertCell(4).innerText = 'Adult · Mr John Doe';
+        roomsData.push({
+            number: 1, type: 'Standard room', mealPlan: 'BB', guestCount: 2, guestNames: 'Adult · Mr John Doe'
+        });
     }
 }
 
-function resetAll(){
-    document.getElementById('companyPhone').value='';
-    document.getElementById('companyAddress').value='';
-    document.getElementById('mail').value='';
-    document.getElementById('phone').value='';
-    document.getElementById('voucherReference').value='';
-    document.getElementById('bookingId').value='';
-    document.getElementById('bookingIdSupplier').value='';
-    document.getElementById('bookingDate').value='';
-    document.getElementById('bookingTime').value='';
-    document.getElementById('hotelName').value='';
-    document.getElementById('checkIn').value='';
-    document.getElementById('checkOut').value='';
-    document.getElementById('roomCount').value='';
-    document.getElementById('roomsContainer').innerHTML='';
-    document.getElementById('logoPreview').src='';
-    document.getElementById('logoPreview').style.display='none';
-    document.getElementById('roomsTable').getElementsByTagName('tbody')[0].innerHTML='';
+function resetAll() {
+    document.querySelectorAll('input').forEach(input => {
+        if (input.type === 'file') {
+            input.value = '';
+        } else if (input.type !== 'button') {
+            input.value = '';
+        }
+    });
+    document.getElementById('supplier').value = 'Tunisiaheds';
+    document.getElementById('roomsContainer').innerHTML = '';
+    document.querySelector('#roomsTable tbody').innerHTML = '';
+    document.getElementById('logoPreview').style.display = 'none';
+    document.getElementById('logoPreview').src = '';
+    roomsData = [];
     roomsBackup = {};
 }
 
-function printReport(){
-    let container = document.createElement('div');
-    container.style.padding = "30px";
-    container.style.direction = "ltr";
-    container.style.fontFamily = "Arial, sans-serif";
-    container.style.fontSize = "14px";
-    
-    let now = new Date();
-    let issueDate = now.toLocaleDateString('en-US');
-    let issueTime = now.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit'});
+// logo upload handler
+document.getElementById('logoUpload').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            const logoPreview = document.getElementById('logoPreview');
+            logoPreview.src = ev.target.result;
+            logoPreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+});
 
-    container.innerHTML = `
-        <div style="text-align: center; margin-bottom: 20px;">
-            <h1 style="color: #223396; margin-bottom: 10px;">Travlink Booking</h1>
-            ${document.getElementById('logoPreview').src ? `<img src="${document.getElementById('logoPreview').src}" style="max-width:120px; margin-bottom:10px;">` : ''}
-        </div>
-        
-        <div style="margin-bottom: 20px;">
-            <h3 style="color: #223396; margin-bottom: 10px;">Issue Date & Time</h3>
-            <p><strong>${issueDate}</strong><br>${issueTime}</p>
-        </div>
-        
-        <hr style="margin: 20px 0;">
-        
-        <div style="margin-bottom: 20px;">
-            <p><strong>Mail</strong> : ${document.getElementById('mail').value || ''}<br>
-            <strong>Phone</strong> : ${document.getElementById('phone').value || ''}</p>
-            
-            <p><strong>Address</strong> : ${document.getElementById('companyAddress').value || 'Libya. Tripoli'}<br>
-            <strong>Phone</strong> : ${document.getElementById('companyPhone').value || '0980031113'}</p>
-        </div>
-        
-        <hr style="margin: 20px 0;">
-        
-        <div style="margin-bottom: 20px;">
-            <h3 style="color: #223396; margin-bottom: 10px;">Hotel Information</h3>
-            <table style="width: 100%; border-collapse: collapse;">
-                <tr>
-                    <td style="border: 1px solid #ddd; padding: 8px; width: 30%;"><strong>Hotel Name</strong></td>
-                    <td style="border: 1px solid #ddd; padding: 8px;">${document.getElementById('hotelName').value || 'Erawn hotel'}</td>
-                </tr>
-                <tr>
-                    <td style="border: 1px solid #ddd; padding: 8px;"><strong>Check-in</strong></td>
-                    <td style="border: 1px solid #ddd; padding: 8px;">${document.getElementById('checkIn').value || '8/18/2025'}</td>
-                </tr>
-                <tr>
-                    <td style="border: 1px solid #ddd; padding: 8px;"><strong>Check-out</strong></td>
-                    <td style="border: 1px solid #ddd; padding: 8px;">${document.getElementById('checkOut').value || '8/20/2025'}</td>
-                </tr>
-            </table>
-        </div>
-        
-        <hr style="margin: 20px 0;">
-        
-        <div style="margin-bottom: 20px;">
-            <h3 style="color: #223396; margin-bottom: 10px;">Booking Information</h3>
-            <table style="width: 100%; border-collapse: collapse;">
-                <tr>
-                    <td style="border: 1px solid #ddd; padding: 8px; width: 30%;"><strong>Voucher Reference</strong></td><td style="border: 1px solid #ddd; padding: 8px;">${document.getElementById('voucherReference').value || '25496'}</td>
-                </tr>
-                <tr>
-                    <td style="border: 1px solid #ddd; padding: 8px;"><strong>BookingID</strong></td>
-                    <td style="border: 1px solid #ddd; padding: 8px;">${document.getElementById('bookingId').value || '23940'}</td>
-                </tr>
-                <tr>
-                    <td style="border: 1px solid #ddd; padding: 8px;"><strong>Supplier</strong></td>
-                    <td style="border: 1px solid #ddd; padding: 8px;">Tunisiaheds</td>
-                </tr>
-                <tr>
-                    <td style="border: 1px solid #ddd; padding: 8px;"><strong>Booking ID supplier</strong></td>
-                    <td style="border: 1px solid #ddd; padding: 8px;">${document.getElementById('bookingIdSupplier').value || '.'}</td>
-                </tr>
-                <tr>
-                    <td style="border: 1px solid #ddd; padding: 8px;"><strong>Booking Date & Time</strong></td>
-                    <td style="border: 1px solid #ddd; padding: 8px;">${document.getElementById('bookingDate').value || issueDate} ${document.getElementById('bookingTime').value || issueTime}</td>
-                </tr>
-            </table>
-        </div>
-        
-        <hr style="margin: 20px 0;">
-        
-        <div style="margin-bottom: 20px;">
-            <h3 style="color: #223396; margin-bottom: 10px;">Rooms Information</h3>
-            <table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd;">
-                <thead>
-                    <tr style="background: #223396; color: white;">
-                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Room Number</th>
-                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Room Type</th>
-                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Meal Plan</th>
-                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Guest Count</th>
-                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Guests</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${[...document.getElementById('roomsTable').getElementsByTagName('tbody')[0].rows].map(row=>{
-                        return `<tr>
-                            <td style="border:1px solid #ddd;padding:6px;text-align:center;">${row.cells[0].innerText}</td>
-                            <td style="border:1px solid #ddd;padding:6px;text-align:center;">${row.cells[1].innerText}</td>
-                            <td style="border:1px solid #ddd;padding:6px;text-align:center;">${row.cells[2].innerText}</td>
-                            <td style="border:1px solid #ddd;padding:6px;text-align:center;">${row.cells[3].innerText}</td>
-                            <td style="border:1px solid #ddd;padding:6px;text-align:center;">${row.cells[4].innerText}</td>
-                        </tr>`;
-                    }).join('')}
-                </tbody>
-            </table>
-        </div>
-    `;
+// function addLogo(doc, imgSrc) {
+//     const maxWidth = 35;  // أقصى عرض للوغو
+//     const maxHeight = 30; // أقصى ارتفاع للوغو
+//     const x = 10;         // موقع اللوغو أفقي
+//     const y = 8;          // موقع اللوغو عمودي
 
-    html2canvas(container).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const imgProps= pdf.getImageProperties(imgData);
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        pdf.save('booking_report.pdf');
+//     const image = new Image();
+//     image.src = imgSrc;
+//     image.onload = function() {
+//         let width = image.width;
+//         let height = image.height;
+
+//         // ضبط الحجم مع الحفاظ على نسبة الارتفاع إلى العرض
+//         const ratio = Math.min(maxWidth / width, maxHeight / height);
+//         width = width * ratio;
+//         height = height * ratio;
+
+//         doc.addImage(image, 'PNG', x, y, width, height);
+//     };
+// }
+
+
+// main PDF generator
+function generatePDF() {
+    // Correct checks for UMD jsPDF & autoTable
+    if (!window.jspdf || typeof window.jspdf.jsPDF !== 'function') {
+        alert('jsPDF library not loaded. Make sure you included jspdf.umd.min.js before script.js');
+        return;
+    }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+
+    if (typeof doc.autoTable !== 'function') {
+        alert('jspdf-autotable plugin not found. Make sure you included jspdf.plugin.autotable.min.js before script.js');
+        return;
+    }
+
+    // Collect form values
+    const companyPhone = document.getElementById('companyPhone').value || 'xxxxxxxxx';
+    const companyName = document.getElementById('Name').value || 'Null';
+    const companyAddress = document.getElementById('companyAddress').value || 'Null';
+    const mail = document.getElementById('mail').value || 'Null';
+    const phone = document.getElementById('phone').value || 'xxxxxxxxx';
+    const voucherReference = document.getElementById('voucherReference').value || 'Null';
+    const bookingId = document.getElementById('bookingId').value || 'Null';
+    const supplier = document.getElementById('supplier').value || 'Tunisiaheds';
+    const bookingIdSupplier = document.getElementById('bookingIdSupplier').value || 'Null';
+    const bookingDate = document.getElementById('bookingDate').value || 'Null';
+    const bookingTime = document.getElementById('bookingTime').value || 'Null';
+    const hotelName = document.getElementById('hotelName').value || 'Null';
+    const checkIn = document.getElementById('checkIn').value || 'Null';
+    const checkOut = document.getElementById('checkOut').value || 'Null';
+
+    // Add logo if present
+    const logoPreview = document.getElementById('logoPreview');
+    if (logoPreview && logoPreview.src && logoPreview.style.display !== 'none') {
+        // detect mime from data URL
+        const src = logoPreview.src;
+        let imgType = 'PNG';
+        if (src.startsWith('data:image/jpeg') || src.startsWith('data:image/jpg')) imgType = 'JPEG';
+        try {
+            doc.addImage(src, imgType, 160, 8, 35, 30);
+        } catch(e) {
+            console.warn('addImage failed:', e);
+        }
+    }
+
+// Add static logo if present
+const staticLogo = document.getElementById('staticLogo');
+if (staticLogo && staticLogo.src) {
+    const src = staticLogo.src;
+    let imgType = 'PNG';
+    if (src.startsWith('data:image/jpeg') || src.startsWith('data:image/jpg')) imgType = 'JPEG';
+    try {
+        doc.addImage(src, imgType, 10, 8, 35, 30); 
+    } catch(e) {
+        console.warn('addImage failed (staticLogo):', e);
+    }
+}
+
+
+    // Header
+   doc.setFontSize(20);
+ //   doc.text(companyName, 105, 20, { align: 'center' });
+    doc.setFontSize(16);
+  // doc.text('Travlink Booking', 105, 30, { align: 'center' });
+    doc.line(10, 40, 200, 40);
+
+    // Date/time
+    doc.setFontSize(10);
+    const now = new Date();
+    const currentDate = now.toLocaleDateString();
+    const currentTime = now.toLocaleTimeString();
+    doc.text('Issue Date & Time:', 20, 45);
+    doc.text(`${currentDate} ${currentTime}`, 52, 45);
+
+    // Contacts
+    doc.text(`Mail: ${mail}`, 20, 55);
+    doc.text(`Phone: ${phone}`, 20, 62);
+   doc.text(`Company Name: ${companyName}`, 120, 55);
+    doc.text(`Address: ${companyAddress}`, 120, 62);
+    doc.text(`Phone: ${companyPhone}`, 120, 69);
+
+    doc.line(10, 75, 200, 75);
+
+    // Hotel info table
+    doc.setFontSize(14);
+    doc.text('Hotel Information', 20, 85);
+
+    doc.autoTable({
+        startY: 90,
+        head: [['Field', 'Value']],
+        body: [
+            ['Hotel Name', hotelName],
+            ['Check-in', checkIn],
+            ['Check-out', checkOut]
+        ],
+        theme: 'grid',
+        styles: { fontSize: 10, cellPadding: 3 },
+        
+        headStyles: { fillColor: [30,35,123] }
+
     });
+
+    // Booking info
+    doc.setFontSize(14);
+    const afterHotelY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 110;
+    doc.text('Booking Information', 20, afterHotelY);
+
+    const bookingDateTime = bookingDate && bookingTime ? `${bookingDate} ${bookingTime}` : 'N/A';
+
+    doc.autoTable({
+        startY: afterHotelY + 5,
+        head: [['Field', 'Value']],
+        body: [
+            ['Voucher Reference', voucherReference],
+            ['Booking ID', bookingId],
+            ['Supplier', supplier],
+            ['Booking ID supplier', bookingIdSupplier],
+            ['Booking Date & Time', bookingDateTime]
+        ],
+        theme: 'grid',
+        styles: { fontSize: 10, cellPadding: 3 },
+        headStyles: { fillColor: [30,35,123] }
+
+    });
+
+    // Rooms table
+    const afterBookingY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : afterHotelY + 40;
+    doc.setFontSize(14);
+    doc.text('Rooms Information', 20, afterBookingY);
+
+    const roomsTableData = (roomsData.length > 0) ? roomsData.map(r => [String(r.number), r.type, r.mealPlan, String(r.guestCount), r.guestNames]) :
+        [['Null','Null','Null','Null','Null']];
+
+    doc.autoTable({
+        startY: afterBookingY + 5,
+        head: [['Room Number','Room Type','Meal Plan','Guest Count','Guest Names']],
+        body: roomsTableData,
+        theme: 'grid',
+        styles: { fontSize: 10, cellPadding: 3 },
+        headStyles: { fillColor: [30,35,123] }
+
+    });
+
+    const notes = [
+        '- Tourism tax in Tunisian hotels is not included and must be paid on-site.',
+        '- Check-in from 2.00 PM | Check-out by 12.00 PM.',
+        '- Most bookings are non-refundable. Please check the cancellation policy before booking.'
+    ];
+
+    doc.setFontSize(10);
+    let notesY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 250;
+    notes.forEach(note => {
+        if (notesY > 280) {
+            doc.addPage();
+            notesY = 20;
+        }
+        doc.text(note, 20, notesY);
+        notesY += 6;
+    });
+
+    // Save
+    doc.save('BookingReport.pdf'); 
 }
