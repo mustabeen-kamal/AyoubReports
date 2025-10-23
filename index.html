@@ -1,140 +1,140 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="author" content="MUSTABEEN_KAMAL">
-<title>Login Page</title>
+<title>Login</title>
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
-
-    body {
-        font-family: 'Poppins', sans-serif;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: radial-gradient(circle at top left, #1e237b, #6a8af3);
-        overflow: hidden;
-    }
-
-    .login-container {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(15px);
-        padding: 50px 40px;
-        border-radius: 20px;
-        box-shadow: 0 8px 40px rgba(0,0,0,0.3);
-        width: 360px;
-        text-align: center;
-        color: white;
-        transition: transform 0.4s;
-    }
-
-    .login-container:hover {
-        transform: translateY(-5px);
-    }
-
-    .login-container h2 {
-        margin-bottom: 30px;
-        font-weight: 600;
-        font-size: 28px;
-        letter-spacing: 1px;
-        color: #ffffff;
-    }
-
-    .login-container input {
-        width: 100%;
-        padding: 14px;
-        margin: 12px 0;
-        border-radius: 12px;
-        border: none;
-        outline: none;
-        font-size: 16px;
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-        transition: 0.3s;
-    }
-
-    .login-container input::placeholder {
-        color: rgba(255,255,255,0.7);
-    }
-
-    .login-container input:focus {
-        background: rgba(255, 255, 255, 0.3);
-        box-shadow: 0 0 10px rgba(255,255,255,0.5);
-    }
-
-    .login-container button {
-        width: 100%;
-        padding: 14px;
-        margin-top: 20px;
-        border-radius: 12px;
-        border: none;
-        background: #ffffff;
-        color: #1e237b;
-        font-size: 17px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-
-    .login-container button:hover {
-        background: #6a8af3;
-        color: white;
-        transform: translateY(-2px);
-    }
-
-    .error-message {
-        color: #ff4d4d;
-        margin-top: 15px;
-        font-weight: 500;
-        display: none;
-        animation: shake 0.3s;
-    }
-
-    @keyframes shake {
-        0% { transform: translateX(0px); }
-        25% { transform: translateX(-5px); }
-        50% { transform: translateX(5px); }
-        75% { transform: translateX(-5px); }
-        100% { transform: translateX(0px); }
-    }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Poppins', sans-serif;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background: radial-gradient(circle at top left, #1e237b, #6a8af3);
+  }
+  .login-container{
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(15px);
+    padding: 50px 40px;
+    border-radius: 20px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+    width: 360px;
+    text-align: center;
+    color: white;
+    transition: transform 0.4s;
+  }
+  .login-container:hover{ transform: translateY(-5px); }
+  .login-container h2{
+    margin-bottom: 30px;
+    font-weight: 600;
+    font-size: 28px;
+    letter-spacing: 1px;
+  }
+  .login-container input{
+    width:100%;
+    padding:14px;
+    margin:12px 0;
+    border-radius:12px;
+    border:none;
+    outline:none;
+    font-size:16px;
+    background: rgba(255,255,255,0.2);
+    color:white;
+    transition:0.3s;
+  }
+  .login-container input::placeholder{ color: rgba(255,255,255,0.7); }
+  .login-container input:focus{
+    background: rgba(255,255,255,0.3);
+    box-shadow: 0 0 10px rgba(255,255,255,0.5);
+  }
+  .login-container button{
+    width:100%;
+    padding:14px;
+    margin-top:20px;
+    border-radius:12px;
+    border:none;
+    background:#ffffff;
+    color:#1e237b;
+    font-size:17px;
+    font-weight:600;
+    cursor:pointer;
+    transition: all 0.3s;
+  }
+  .login-container button:hover{
+    background:#6a8af3;
+    color:white;
+    transform:translateY(-2px);
+  }
+  .error-message{
+    color:#ff4d4d;
+    margin-top:15px;
+    font-weight:500;
+    display:none;
+    animation: shake 0.3s;
+  }
+  @keyframes shake{
+    0%{transform:translateX(0px);}
+    25%{transform:translateX(-5px);}
+    50%{transform:translateX(5px);}
+    75%{transform:translateX(-5px);}
+    100%{transform:translateX(0px);}
+  }
 </style>
 </head>
 <body>
 
 <div class="login-container">
-    <h2>Welcome Back</h2>
-    <input type="text" id="username" placeholder="Username">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Login</button>
-    <div class="error-message" id="errorMsg">Invalid username or password!</div>
+  <h2>Welcome Back</h2>
+  <input id="username" type="text" placeholder="Username">
+  <input id="password" type="password" placeholder="Password">
+  <button id="loginBtn">Login</button>
+  <div class="error-message" id="errorMsg">Invalid username or password!</div>
 </div>
 
 <script>
-    const correctUsername = "Sirius Black";
-    const correctPassword = "Harry_Potter";
+// الهاشات المخزنة (SHA-256 للنصوص)
+const _APP_SECRETS = {
+  u: "1c0b44360cf0bfacec46cff2e6c6ae3fe3dafdb03ac6b8aabfe7bc80f7cecdb0", 
+  p: "169a94041568db624a93726c479d21a57ca630754f2d169e82dc0f338b30362d"  
+};
 
-    function login() {
-        const username = document.getElementById("username").value;
-        const password = document.getElementById("password").value;
+const msgEl = document.getElementById('errorMsg');
 
-        if(username === correctUsername && password === correctPassword) {
-            window.location.href = "main.html";
-        } else {
-            const error = document.getElementById("errorMsg");
-            error.style.display = "block";
-            error.classList.remove('shake');
-            void error.offsetWidth;
-            error.classList.add('shake');
-        }
-    }
+async function sha256Hex(str){
+  const enc = new TextEncoder();
+  const data = enc.encode(str);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+document.getElementById('loginBtn').addEventListener('click', async ()=>{
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+
+  if(!username || !password){
+    msgEl.textContent = "Please fill both fields";
+    msgEl.style.display = 'block';
+    return;
+  }
+
+  const hUser = await sha256Hex(username);
+  const hPass = await sha256Hex(password);
+
+  if(hUser === _APP_SECRETS.u && hPass === _APP_SECRETS.p){
+    msgEl.style.display = 'none';
+    // إعادة توجيه بعد قليل
+    setTimeout(()=>{ window.location.href = 'main.html'; }, 300);
+  } else {
+    msgEl.style.display = 'block';
+    msgEl.classList.remove('shake');
+    void msgEl.offsetWidth; // لإعادة تشغيل تأثير الـ shake
+    msgEl.classList.add('shake');
+  }
+});
 </script>
 
 </body>
