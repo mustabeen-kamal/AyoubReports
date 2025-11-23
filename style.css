@@ -1,6 +1,6 @@
 body {
     font-family: Arial, sans-serif;
-    background: #f3f3f6;
+    background: #010101;
     direction: ltr;
 }
 
@@ -8,29 +8,29 @@ body {
     max-width: 1200px;
     margin: 30px auto;
     background: white;
-    border: 1px solid #1e237b;
+    border: 1px solid #010101;
     border-radius: 14px;
     box-shadow: 0 0 15px #c1c1e1;
     padding: 18px 24px;
 }
 
 h2 {
-    color: #223396;
+    color: #010101;
     margin-top: 12px;
     margin-bottom: 12px;
 }
 
 .form-section, .rooms-section {
-    border: 2px solid #1e237b;
+    border: 2px solid #010101;
     border-radius: 12px;
     padding: 16px;
     margin-bottom: 16px;
-    background: #e8ecfa;
+    background: #f1f1f1;
 }
 
 label {
     margin-right: 12px;
-    color: #233077;
+    color: #010101;
     font-weight: 500;
 }
 
@@ -44,7 +44,7 @@ input, select {
 }
 
 #logoPreview {
-    border: 1px solid #1e237b;
+    border: 1px solid #f1f1f1;
     border-radius: 8px;
     margin-top: 8px;
     margin-bottom: 8px;
@@ -81,7 +81,7 @@ input, select {
 }
 
 button {
-    background: #1e237b;
+    background: #e5aa2a;
     color: white;
     padding: 8px 14px;
     border-radius: 7px;
@@ -93,7 +93,7 @@ button {
     margin-bottom: 9px;
 }
 button:hover {
-    background: #223396;
+    background: #f3daa3;
 }
 
 table {
@@ -103,12 +103,12 @@ table {
     margin-top: 18px;
 }
 th, td {
-    border: 1px solid #1e237b;
+    border: 1px solid #e5aa2a;
     padding: 9px;
     font-size: 16px;
     text-align: center;
 }
 th {
-    background: #1e237b;
+    background: #e5aa2a;
     color: #fff;
 }

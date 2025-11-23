@@ -230,6 +230,9 @@ function generatePDF() {
     }
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'mm', 'a4');
+    doc.setFillColor(241, 241, 241);
+    doc.rect(0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight(), "F");
+
 
     if (typeof doc.autoTable !== 'function') {
         alert('jspdf-autotable plugin not found. Make sure you included jspdf.plugin.autotable.min.js before script.js');
@@ -273,7 +276,7 @@ if (staticLogo && staticLogo.src) {
     let imgType = 'PNG';
     if (src.startsWith('data:image/jpeg') || src.startsWith('data:image/jpg')) imgType = 'JPEG';
     try {
-        doc.addImage(src, imgType, 10, 8, 35, 30); 
+        doc.addImage(src, imgType, 5, 0, 70, 60); // عرض أكبر وارتفاع أكبر
     } catch(e) {
         console.warn('addImage failed (staticLogo):', e);
     }
@@ -319,7 +322,8 @@ if (staticLogo && staticLogo.src) {
         theme: 'grid',
         styles: { fontSize: 10, cellPadding: 3 },
         
-        headStyles: { fillColor: [30,35,123] }
+        headStyles: { fillColor: [243, 218, 163]
+ }
 
     });
 
@@ -342,7 +346,8 @@ if (staticLogo && staticLogo.src) {
         ],
         theme: 'grid',
         styles: { fontSize: 10, cellPadding: 3 },
-        headStyles: { fillColor: [30,35,123] }
+        headStyles: { fillColor: [243, 218, 163]
+ }
 
     });
 
@@ -360,7 +365,8 @@ if (staticLogo && staticLogo.src) {
         body: roomsTableData,
         theme: 'grid',
         styles: { fontSize: 10, cellPadding: 3 },
-        headStyles: { fillColor: [30,35,123] }
+        headStyles: { fillColor: [243, 218, 163]
+}
 
     });
 
