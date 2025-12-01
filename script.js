@@ -1,6 +1,22 @@
-// script.js (fixed)
+//logo problem
+
+
 let roomsBackup = {};
 let roomsData = [];
+
+function toggleDataType() {
+    const dataType = document.getElementById('dataType').value;
+    const companyFields = document.getElementById('companyFields');
+    const customerFields = document.getElementById('customerFields');
+    
+    if (dataType === 'company') {
+        companyFields.style.display = 'block';
+        customerFields.style.display = 'none';
+    } else {
+        companyFields.style.display = 'none';
+        customerFields.style.display = 'block';
+    }
+}
 
 function generateRooms(){
     let count = parseInt(document.getElementById('roomCount').value);
@@ -39,53 +55,51 @@ function generateRooms(){
         guestsDiv.className = "guests-container";
         panel.appendChild(guestsDiv);
 
-      function renderGuests(n){
-    guestsDiv.innerHTML = "";
-    for(let j=1;j<=n;j++){
-        let group = document.createElement('div');
-        group.className = "guest-group";
-        group.style.marginTop = "6px";
+        function renderGuests(n){
+            guestsDiv.innerHTML = "";
+            for(let j=1;j<=n;j++){
+                let group = document.createElement('div');
+                group.className = "guest-group";
+                group.style.marginTop = "6px";
 
-        let gtype = document.createElement('select');
-        gtype.innerHTML='<option>Adult</option><option>Child</option>';
-        gtype.style.marginRight = "6px";
+                let gtype = document.createElement('select');
+                gtype.innerHTML='<option>Adult</option><option>Child</option>';
+                gtype.style.marginRight = "6px";
 
-        let gtitle = document.createElement('select');
-        gtitle.innerHTML='<option>Mr</option><option>Mrs</option><option>Ms</option>';
-        gtitle.style.marginRight = "6px";
+                let gtitle = document.createElement('select');
+                gtitle.innerHTML='<option>Mr</option><option>Mrs</option><option>Ms</option>';
+                gtitle.style.marginRight = "6px";
 
-        let gname = document.createElement('input');
-        gname.type = "text";
-        gname.placeholder = 'Guest ' + j;
+                let gname = document.createElement('input');
+                gname.type = "text";
+                gname.placeholder = 'Guest ' + j;
 
-        // combo box للأعمار
-        let ageSelect = document.createElement('select');
-        for(let k=1; k<=12; k++){
-            let opt = document.createElement('option');
-            opt.value = k;
-            opt.textContent = k;
-            ageSelect.appendChild(opt);
-        }
-        ageSelect.style.marginLeft = "6px";
-        ageSelect.style.display = "none"; // مخفي افتراضيًا
-
-        gtype.addEventListener('change', function(){
-            if(this.value === "Child"){
-                ageSelect.style.display = "inline-block";
-            } else {
+                let ageSelect = document.createElement('select');
+                for(let k=1; k<=12; k++){
+                    let opt = document.createElement('option');
+                    opt.value = k;
+                    opt.textContent = k;
+                    ageSelect.appendChild(opt);
+                }
+                ageSelect.style.marginLeft = "6px";
                 ageSelect.style.display = "none";
+
+                gtype.addEventListener('change', function(){
+                    if(this.value === "Child"){
+                        ageSelect.style.display = "inline-block";
+                    } else {
+                        ageSelect.style.display = "none";
+                    }
+                });
+
+                group.appendChild(gtype);
+                group.appendChild(gtitle);
+                group.appendChild(gname);
+                group.appendChild(ageSelect);
+
+                guestsDiv.appendChild(group);
             }
-        });
-
-        group.appendChild(gtype);
-        group.appendChild(gtitle);
-        group.appendChild(gname);
-        group.appendChild(ageSelect);
-
-        guestsDiv.appendChild(group);
-    }
-}
-
+        }
 
         guestCount.addEventListener('input', function(){
             let val = parseInt(this.value) || 0;
@@ -109,7 +123,6 @@ function generateRooms(){
 }
 
 function addRoomsToTable(){
-    // empty previous table
     let tableBody = document.getElementById('roomsTable').getElementsByTagName('tbody')[0];
     tableBody.innerHTML = "";
     roomsData = [];
@@ -125,7 +138,6 @@ function addRoomsToTable(){
         row.insertCell(2).innerText = data.MealPlan.value;
         row.insertCell(3).innerText = data.GuestCount.value;
 
-        // Guests with age for children
         let guestsList = [];
         let guestGroups = data.GuestsDiv.getElementsByClassName('guest-group');
         for(let g=0; g<guestGroups.length; g++){
@@ -144,7 +156,6 @@ function addRoomsToTable(){
         }
         row.insertCell(4).innerText = guestsList.join(', ');
 
-        // push to roomsData for PDF
         roomsData.push({
             number: data.number,
             type: data.RoomType.value,
@@ -155,7 +166,6 @@ function addRoomsToTable(){
     }
 
     if (roomsData.length === 0) {
-        // if nothing generated, add default room to both table and roomsData
         let row = tableBody.insertRow();
         row.insertCell(0).innerText = 1;
         row.insertCell(1).innerText = 'Standard room';
@@ -176,6 +186,22 @@ function resetAll() {
             input.value = '';
         }
     });
+    document.querySelectorAll('select').forEach(select => {
+        if (select.id !== 'dataType') {
+            select.selectedIndex = 0;
+        }
+    });
+    
+    // Reset company/customer fields
+    document.getElementById('companyName').value = '';
+    document.getElementById('companyPhone').value = '';
+    document.getElementById('companyAddress').value = '';
+    document.getElementById('customerName').value = '';
+    document.getElementById('customerPhone').value = '';
+    document.getElementById('customerAddress').value = '';
+    document.getElementById('dataType').selectedIndex = 0;
+    toggleDataType();
+    
     document.getElementById('supplier').value = 'Tunisiaheds';
     document.getElementById('roomsContainer').innerHTML = '';
     document.querySelector('#roomsTable tbody').innerHTML = '';
@@ -199,33 +225,9 @@ document.getElementById('logoUpload').addEventListener('change', function(e) {
     }
 });
 
-// function addLogo(doc, imgSrc) {
-//     const maxWidth = 35;  // أقصى عرض للوغو
-//     const maxHeight = 30; // أقصى ارتفاع للوغو
-//     const x = 10;         // موقع اللوغو أفقي
-//     const y = 8;          // موقع اللوغو عمودي
-
-//     const image = new Image();
-//     image.src = imgSrc;
-//     image.onload = function() {
-//         let width = image.width;
-//         let height = image.height;
-
-//         // ضبط الحجم مع الحفاظ على نسبة الارتفاع إلى العرض
-//         const ratio = Math.min(maxWidth / width, maxHeight / height);
-//         width = width * ratio;
-//         height = height * ratio;
-
-//         doc.addImage(image, 'PNG', x, y, width, height);
-//     };
-// }
-
-
-// main PDF generator
 function generatePDF() {
-    // Correct checks for UMD jsPDF & autoTable
     if (!window.jspdf || typeof window.jspdf.jsPDF !== 'function') {
-        alert('jsPDF library not loaded. Make sure you included jspdf.umd.min.js before script.js');
+        alert('jsPDF library not loaded.');
         return;
     }
     const { jsPDF } = window.jspdf;
@@ -233,86 +235,117 @@ function generatePDF() {
     doc.setFillColor(241, 241, 241);
     doc.rect(0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight(), "F");
 
-
     if (typeof doc.autoTable !== 'function') {
-        alert('jspdf-autotable plugin not found. Make sure you included jspdf.plugin.autotable.min.js before script.js');
+        alert('jspdf-autotable plugin not found.');
         return;
     }
 
-    // Collect form values
-    const companyPhone = document.getElementById('companyPhone').value || 'xxxxxxxxx';
-    const companyName = document.getElementById('Name').value || 'Null';
-    const companyAddress = document.getElementById('companyAddress').value || 'Null';
-    const mail = document.getElementById('mail').value || 'Null';
-    const phone = document.getElementById('phone').value || 'xxxxxxxxx';
+    // Get data type and values
+    const dataType = document.getElementById('dataType').value;
+    let name, phone, address;
+    
+    if (dataType === 'company') {
+        name = document.getElementById('companyName').value || 'Null';
+        phone = document.getElementById('companyPhone').value || 'xxxxxxxxx';
+        address = document.getElementById('companyAddress').value || 'Null';
+    } else {
+        name = document.getElementById('customerName').value || 'Null';
+        phone = document.getElementById('customerPhone').value || 'xxxxxxxxx';
+        address = document.getElementById('customerAddress').value || 'Null';
+    }
+    
+    const typeLabel = dataType === 'company' ? 'Company' : 'Customer';
+
     const voucherReference = document.getElementById('voucherReference').value || 'Null';
-    const bookingId = document.getElementById('bookingId').value || 'Null';
     const supplier = document.getElementById('supplier').value || 'Tunisiaheds';
     const bookingIdSupplier = document.getElementById('bookingIdSupplier').value || 'Null';
-    const bookingDate = document.getElementById('bookingDate').value || 'Null';
-    const bookingTime = document.getElementById('bookingTime').value || 'Null';
     const hotelName = document.getElementById('hotelName').value || 'Null';
     const checkIn = document.getElementById('checkIn').value || 'Null';
     const checkOut = document.getElementById('checkOut').value || 'Null';
 
-    // Add logo if present
+    // ===== اللوقو كما كان يعمل في الأصل =====
+    
+    // Add uploaded logo إذا اختاره المستخدم
+       // ===== اللوقو كما كان يعمل في الأصل =====
+    
+    // Add uploaded logo إذا اختاره المستخدم
     const logoPreview = document.getElementById('logoPreview');
+    const staticLogo = document.getElementById('staticLogo');
+    
+    let logoAdded = false;
+    
+    // أولاً: حاول إضافة اللوقو المرفوع إذا كان موجوداً ومرئياً
     if (logoPreview && logoPreview.src && logoPreview.style.display !== 'none') {
-        // detect mime from data URL
         const src = logoPreview.src;
         let imgType = 'PNG';
         if (src.startsWith('data:image/jpeg') || src.startsWith('data:image/jpg')) imgType = 'JPEG';
         try {
-            doc.addImage(src, imgType, 160, 8, 35, 30);
+            doc.addImage(src, imgType,  5, 0, 50, 45);
+            logoAdded = true;
         } catch(e) {
             console.warn('addImage failed:', e);
         }
     }
-
-// Add static logo if present
-const staticLogo = document.getElementById('staticLogo');
-if (staticLogo && staticLogo.src) {
-    const src = staticLogo.src;
-    let imgType = 'PNG';
-    if (src.startsWith('data:image/jpeg') || src.startsWith('data:image/jpg')) imgType = 'JPEG';
-    try {
-        doc.addImage(src, imgType, 5, 0, 70, 60); // عرض أكبر وارتفاع أكبر
-    } catch(e) {
-        console.warn('addImage failed (staticLogo):', e);
+    
+    // ثانياً: إذا لم يتم إضافة لوقو مرفوع، أضف اللوقو الافتراضي
+    if (!logoAdded && staticLogo && staticLogo.src) {
+        const src = staticLogo.src;
+        let imgType = 'PNG';
+        if (src.startsWith('data:image/jpeg') || src.startsWith('data:image/jpg')) imgType = 'JPEG';
+        try {
+            doc.addImage(src, imgType, 5, 0, 50, 45);
+        } catch(e) {
+            console.warn('addImage failed (staticLogo):', e);
+        }
     }
-}
 
-
+    // ===== باقي الكود كما كان =====
+    
     // Header
-   doc.setFontSize(20);
- //   doc.text(companyName, 105, 20, { align: 'center' });
-    doc.setFontSize(16);
-  // doc.text('Travlink Booking', 105, 30, { align: 'center' });
-    doc.line(10, 40, 200, 40);
+    doc.setFontSize(20);
+    doc.line(10, 30, 200, 30);
 
     // Date/time
     doc.setFontSize(10);
     const now = new Date();
     const currentDate = now.toLocaleDateString();
     const currentTime = now.toLocaleTimeString();
-    doc.text('Issue Date & Time:', 20, 45);
-    doc.text(`${currentDate} ${currentTime}`, 52, 45);
+    doc.text('Issue Date & Time:', 120, 25);
+    doc.text(`${currentDate} ${currentTime}`, 153, 25);
 
-    // Contacts
-    doc.text(`Mail: ${mail}`, 20, 55);
-    doc.text(`Phone: ${phone}`, 20, 62);
-   doc.text(`Company Name: ${companyName}`, 120, 55);
-    doc.text(`Address: ${companyAddress}`, 120, 62);
-    doc.text(`Phone: ${companyPhone}`, 120, 69);
+    // Company/Customer info
+    doc.setFontSize(15);
+    doc.text(`${typeLabel} Name: ${name}`, 20, 45);
+    doc.text(`${typeLabel} Phone: ${phone}`, 20, 55);
+    doc.text(`${typeLabel} Address: ${address}`, 20, 65);
 
+    // خط فاصل
     doc.line(10, 75, 200, 75);
 
-    // Hotel info table
+    // ===== Booking Information =====
     doc.setFontSize(14);
-    doc.text('Hotel Information', 20, 85);
+    doc.text('Booking Information', 20, 85);
 
     doc.autoTable({
         startY: 90,
+        head: [['Field', 'Value']],
+        body: [
+            ['Voucher Reference', voucherReference],
+            ['Supplier', supplier],
+            ['Booking ID Supplier', bookingIdSupplier]
+        ],
+        theme: 'grid',
+        styles: { fontSize: 10, cellPadding: 3 },
+        headStyles: { fillColor: [243, 218, 163] }
+    });
+
+    // ===== Hotel Information =====
+    const afterBookingY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 120;
+    doc.setFontSize(14);
+    doc.text('Hotel Information', 20, afterBookingY);
+
+    doc.autoTable({
+        startY: afterBookingY + 5,
         head: [['Field', 'Value']],
         body: [
             ['Hotel Name', hotelName],
@@ -321,55 +354,27 @@ if (staticLogo && staticLogo.src) {
         ],
         theme: 'grid',
         styles: { fontSize: 10, cellPadding: 3 },
-        
-        headStyles: { fillColor: [243, 218, 163]
- }
-
+        headStyles: { fillColor: [243, 218, 163] }
     });
 
-    // Booking info
+    // ===== Rooms Information =====
+    const afterHotelY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 150;
     doc.setFontSize(14);
-    const afterHotelY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 110;
-    doc.text('Booking Information', 20, afterHotelY);
-
-    const bookingDateTime = bookingDate && bookingTime ? `${bookingDate} ${bookingTime}` : 'N/A';
-
-    doc.autoTable({
-        startY: afterHotelY + 5,
-        head: [['Field', 'Value']],
-        body: [
-            ['Voucher Reference', voucherReference],
-            ['Booking ID', bookingId],
-            ['Supplier', supplier],
-            ['Booking ID supplier', bookingIdSupplier],
-            ['Booking Date & Time', bookingDateTime]
-        ],
-        theme: 'grid',
-        styles: { fontSize: 10, cellPadding: 3 },
-        headStyles: { fillColor: [243, 218, 163]
- }
-
-    });
-
-    // Rooms table
-    const afterBookingY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : afterHotelY + 40;
-    doc.setFontSize(14);
-    doc.text('Rooms Information', 20, afterBookingY);
+    doc.text('Rooms Information', 20, afterHotelY);
 
     const roomsTableData = (roomsData.length > 0) ? roomsData.map(r => [String(r.number), r.type, r.mealPlan, String(r.guestCount), r.guestNames]) :
         [['Null','Null','Null','Null','Null']];
 
     doc.autoTable({
-        startY: afterBookingY + 5,
+        startY: afterHotelY + 5,
         head: [['Room Number','Room Type','Meal Plan','Guest Count','Guest Names']],
         body: roomsTableData,
         theme: 'grid',
         styles: { fontSize: 10, cellPadding: 3 },
-        headStyles: { fillColor: [243, 218, 163]
-}
-
+        headStyles: { fillColor: [243, 218, 163] }
     });
 
+    // ===== Notes =====
     const notes = [
         '- Tourism tax in Tunisian hotels is not included and must be paid on-site.',
         '- Check-in from 2.00 PM | Check-out by 12.00 PM.',
@@ -378,6 +383,7 @@ if (staticLogo && staticLogo.src) {
 
     doc.setFontSize(10);
     let notesY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 250;
+    
     notes.forEach(note => {
         if (notesY > 280) {
             doc.addPage();
@@ -387,6 +393,10 @@ if (staticLogo && staticLogo.src) {
         notesY += 6;
     });
 
+    // Add email footer
+    doc.setFontSize(10);
+    doc.text('Email: Blackbird.tourism@outlook.com', 105, 285, { align: 'center' });
+
     // Save
-    doc.save('BookingReport.pdf'); 
+    doc.save('BookingReport.pdf');
 }
